@@ -16,3 +16,20 @@ In another terminal
 
 
 > go run src/main.go
+
+
+Lesson 2 Publishing Messages to a Message Queue
+
+> go run src/distributed/sensors/sensor.go --help
+Usage of /var/folders/r_/73qf_6nn1ln64l92czgmjwlr0000gp/T/go-build263160506/command-line-arguments/_obj/exe/sensor:
+  -freq uint
+    	update frequency in cycles/sec (default 5)
+  -max float
+    	maximum value for generated readings (default 5)
+  -min float
+    	minimum value for generated readings (default 1)
+  -name string
+    	name of the sensor (default "sensor")
+  -step float
+    	maximum allowable change per measurement (default 0.1)
+exit status 2
