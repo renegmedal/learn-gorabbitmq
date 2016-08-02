@@ -36,6 +36,16 @@ func main() {
 
 	dataQueue := qutils.GetQueue(*name, ch)
 
+	sensorQueue := qutils.GetQueue(qutils.SensorListQueue, ch)
+
+	msg := amqp.Publishing{Body: []byte(*name)}
+	ch.Publish(
+		"",               //exchange string,
+		sensorQueue.Name, //key string,
+		false,            // mandatory bool,
+		false,            // immediate bool,
+		msg)              // msg amqp.Publishing
+
 	// convert cycles/second into milliseconds/cycle
 	// 5 cycles/sec = 200 milliseconds/cycle
 	dur, _ := time.ParseDuration(strconv.Itoa(1000/int(*freq)) + "ms")
