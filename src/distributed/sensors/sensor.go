@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"distributed/dto"
+	"encoding/gob"
 	"flag"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
 )
+
+var url = "amqp://guest:guest@localhost:5672"
 
 var name = flag.String("name", "sensor", "name of the sensor")
 var freq = flag.Uint("freq", 5, "update frequency in cycles/sec")
@@ -28,8 +33,20 @@ func main() {
 
 	signal := time.Tick(dur)
 
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+
 	for range signal {
 		calcValue()
+		reading := dto.SensorMessage{
+			Name:      *name,
+			Value:     value,
+			Timestamp: time.Now(),
+		}
+
+		buf.Reset()
+		enc.Encode(reading)
+
 		log.Printf("Reading sent. Value: %v\n", value)
 	}
 }
