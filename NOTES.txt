@@ -1,0 +1,18 @@
+
+Start rabbitmq
+
+> rabbitmq-server
+
+In another terminal
+
+> rabbitmqctl stop
+
+> rabbitmqctl list_queues
+
+> rabbitmqctl cluster_status
+
+
+> go get -u github.com/streadway/amqp
+
+
+> go run src/main.go
