@@ -17,18 +17,18 @@ func GetChannel(url string) (*amqp.Connection, *amqp.Channel) {
 
 }
 
-func getQueue(name string, ch *amqp.Channel) *amqp.Queue {
-    q, err : ch.QueueDeclare(
-      name,     //name string,
-      false,    //durable bool,
-      false,    //autoDelete bool,
-      false,    //exclusive bool,
-      false,    //noWait bool,
-      nil)      //args amqp.Table)
+func GetQueue(name string, ch *amqp.Channel) *amqp.Queue {
+	q, err := ch.QueueDeclare(
+		name,  //name string,
+		false, //durable bool,
+		false, //autoDelete bool,
+		false, //exclusive bool,
+		false, //noWait bool,
+		nil)   //args amqp.Table)
 
-    failOnError(erro, "Failed to declare queue")
+	failOnError(err, "Failed to declare queue")
 
-    return &q
+	return &q
 }
 
 func failOnError(err error, msg string) {

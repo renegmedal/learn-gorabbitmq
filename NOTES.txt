@@ -33,3 +33,9 @@ Usage of /var/folders/r_/73qf_6nn1ln64l92czgmjwlr0000gp/T/go-build263160506/comm
   -step float
     	maximum allowable change per measurement (default 0.1)
 exit status 2
+
+
+
+To run the sensor
+
+> go run src/distributed/sensors/sensor.go

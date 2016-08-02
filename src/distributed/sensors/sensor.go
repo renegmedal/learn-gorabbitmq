@@ -3,12 +3,15 @@ package main
 import (
 	"bytes"
 	"distributed/dto"
+	"distributed/qutils"
 	"encoding/gob"
 	"flag"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/streadway/amqp"
 )
 
 var url = "amqp://guest:guest@localhost:5672"
@@ -26,6 +29,12 @@ var nom = (*max-*min)/2 + *min
 
 func main() {
 	flag.Parse()
+
+	conn, ch := qutils.GetChannel(url)
+	defer conn.Close()
+	defer ch.Close()
+
+	dataQueue := qutils.GetQueue(*name, ch)
 
 	// convert cycles/second into milliseconds/cycle
 	// 5 cycles/sec = 200 milliseconds/cycle
@@ -46,6 +55,17 @@ func main() {
 
 		buf.Reset()
 		enc.Encode(reading)
+
+		msg := amqp.Publishing{
+			Body: buf.Bytes(),
+		}
+
+		ch.Publish(
+			"",             // exchange string,
+			dataQueue.Name, //key string,
+			false,          //mandatory bool,
+			false,          // immediate bool,
+			msg)            // amqp.Publishing)
 
 		log.Printf("Reading sent. Value: %v\n", value)
 	}
