@@ -46,5 +46,5 @@ func calcValue() {
 		minStep = -1 * *stepSize
 	}
 
-	value += r.Float64() * (maxStep - minStep + minStep)
+	value += r.Float64()*(maxStep-minStep) + minStep
 }
