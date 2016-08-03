@@ -17,16 +17,37 @@ type QueueListener struct {
 	conn    *amqp.Connection
 	ch      *amqp.Channel
 	sources map[string]<-chan amqp.Delivery
+	ea      *EventAggregator
 }
 
 func NewQueueListener() *QueueListener {
 	ql := QueueListener{
 		sources: make(map[string]<-chan amqp.Delivery),
+		ea:      NewEventAggregator(),
 	}
 
 	ql.conn, ql.ch = qutils.GetChannel(url)
 
 	return &ql
+}
+
+func (ql *QueueListener) DiscoverSensors() {
+	ql.ch.ExchangeDeclare(
+		qutils.SensorDiscoveryExchange, //name string,
+		"fanout",                       //kind string,
+		false,                          //durable bool,
+		false,                          //autoDelete bool,
+		false,                          //internal bool,
+		false,                          //noWait bool,
+		nil)                            //args amqp.Table)
+
+	ql.ch.Publish(
+		qutils.SensorDiscoveryExchange, //exchange string,
+		"",                //key string,
+		false,             //mandatory bool,
+		false,             //immediate bool,
+		amqp.Publishing{}) //msg amqp.Publishing
+
 }
 
 func (ql *QueueListener) ListenForNewSource() {
@@ -47,6 +68,9 @@ func (ql *QueueListener) ListenForNewSource() {
 		false,  //noWait bool,
 		nil)    //args amqp.Table
 
+	ql.DiscoverSensors()
+
+	fmt.Println("listening for a new sources")
 	for msg := range msgs {
 		sourceChan, _ := ql.ch.Consume(
 			string(msg.Body), //queue string,
@@ -73,5 +97,13 @@ func (ql *QueueListener) AddListener(msgs <-chan amqp.Delivery) {
 		d.Decode(sd)
 
 		fmt.Printf("Received message: %v\n", sd)
+
+		ed := EventData{
+			Name:      sd.Name,
+			Timestamp: sd.Timestamp,
+			Value:     sd.Value,
+		}
+
+		ql.ea.PublishEvent("MessageReceived_"+msg.RoutingKey, ed)
 	}
 }

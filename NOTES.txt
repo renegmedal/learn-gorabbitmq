@@ -50,3 +50,9 @@ First run
 Then call
 
 > go run src/distributed/sensors/sensor.go
+
+Then add more coordinators
+
+> go run src/distributed/coordinator/exec/main.go
+> go run src/distributed/coordinator/exec/main.go
+> go run src/distributed/coordinator/exec/main.go
